@@ -1,0 +1,82 @@
+name: dbt CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  dbt-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt and dependencies
+        run: |
+          pip install dbt-snowflake
+
+      - name: Configure dbt Profiles
+        run: |
+          mkdir -p ~/.dbt
+          cp ./profiles/profiles.yml ~/.dbt/profiles.yml
+
+      - name: Set up Snowflake credentials
+        run: |
+          echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_DEV_DB=${{ secrets.SNOWFLAKE_DEV_DB }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_PROD_DB=${{ secrets.SNOWFLAKE_PROD_DB }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WAREHOUSE }}" >> $GITHUB_ENV
+
+      - name: Run dbt Build & Test
+        run: |
+          dbt debug
+          dbt deps
+          dbt build --target=dev
+
+  deploy-to-prod:
+    needs: dbt-build-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt and dependencies
+        run: |
+          pip install dbt-snowflake
+
+      - name: Configure dbt Profiles
+        run: |
+          mkdir -p ~/.dbt
+          cp ./profiles/profiles.yml ~/.dbt/profiles.yml
+
+      - name: Set up Snowflake credentials
+        run: |
+          echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_PROD_DB=${{ secrets.SNOWFLAKE_PROD_DB }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WAREHOUSE }}" >> $GITHUB_ENV
+
+      - name: Deploy to Prod
+        run: |
+          dbt build --target=prod
