@@ -10,4 +10,15 @@ dbtlearn:
       type: snowflake
       user: Saanviiii511
       warehouse: COMPUTE_WH
-  target: dev
+      
+    Prod:
+      account: kg94819.central-india.azure
+      database: AIRBNB
+      password: "Saanvi@12345678"
+      role: ACCOUNTADMIN
+      schema: RAW
+      threads: 1
+      type: snowflake
+      user: Saanviiii511
+      warehouse: COMPUTE_WH
+ 
