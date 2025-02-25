@@ -8,7 +8,7 @@ SELECT
     id AS listing_id,
     name AS listing_name,
     listing_url AS URL_,
-    room_type,
+    room_type AS ROOMtype,
     minimum_nights,
     host_id,
     price AS price_str,
