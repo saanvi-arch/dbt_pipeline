@@ -12,7 +12,7 @@ dbtlearn:
       user: Saanviiii511
       warehouse: COMPUTE_WH
 
-    Prod:
+    prod:
       account: kg94819.central-india.azure
       database: AIRBNB
       password: "Saanvi@12345678"
