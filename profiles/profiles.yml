@@ -1,5 +1,5 @@
 dbtlearn:
-  target: dev
+  target: prod
   outputs:
     dev:
       account: kg94819.central-india.azure
