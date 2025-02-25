@@ -1,6 +1,6 @@
 dbtlearn:
+  target: dev
   outputs:
-    target: dev
     dev:
       account: kg94819.central-india.azure
       database: AIRBNB
@@ -22,4 +22,3 @@ dbtlearn:
       type: snowflake
       user: Saanviiii511
       warehouse: COMPUTE_WH
- 
